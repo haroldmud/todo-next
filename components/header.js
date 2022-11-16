@@ -7,7 +7,7 @@ function Header() {
       HOME
     </Link>
     <Link className="ml-12" href="/edit">
-      ADD
+      ADD-FORM
     </Link>
   </header>
   )
