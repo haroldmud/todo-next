@@ -5,21 +5,25 @@ import {RiCheckboxBlankCircleLine} from "react-icons/ri"
 import {RiCheckboxCircleLine} from "react-icons/ri"
 import {AiOutlineEdit} from "react-icons/ai"
 import {BiCheck} from "react-icons/bi"
+import {RxCross2} from "react-icons/rx"
 
 
 export default function Home() {
   const [list, setList] = useState([]);
   const [item, setItem] = useState("");
   const [check, setCheck]=useState(-1);
-  const [edit, setEdit] = useState(null);
+  const [edit, setEdit] = useState(null); 
   const [alerte, setAlerte] = useState(false)
   const [limit, setLimit] = useState(false)
+  const [newItem, setNewItem] = useState("")
+  // const [newEdit, setNewEdit] = useState(true)
+  
   
   function handleList(e){
     e.preventDefault();
     item.split("").length < 1 ? setAlerte(true) : item.split("").length > 20 ? setLimit(true) : setList(current => [...current, {text: item, checked: false, trash: false}]);
     item.split("").length > 20 ?
-    setItem(current => current) : setItem("") ;
+    setItem(current => current) : setItem("");
   }
   
   useEffect(()=>{
@@ -41,7 +45,10 @@ export default function Home() {
     const newList = [...list];
     newList.splice(index,1);
     setList(newList);
-  }  
+    setCheck(-1)
+  }
+
+  // function HandleEdit(i)
 
   return (
    <section className="flex justify-center">
@@ -59,40 +66,51 @@ export default function Home() {
             </form>
           </div>
         <p className={`${alerte ? "block" : "hidden"} text-red-500 text-[0.7rem] italic ml-28`}>the field is empty</p>
-        <p className={`${limit ? "block" : "hidden"} text-green-500 text-[0.7rem] italic ml-28`}>oops! the characters were exceeded</p>
+        <p className={`${limit ? "block" : "hidden"} text-red-400 text-[0.7rem] italic ml-28`}>There must be less than 20 characters</p>
           <div className="flex justify-center">
-            <div className={`flex w-5/12 h-[10rem] ${list.length < 6 ?"":"scroll overflow-y-scroll"}  justify-center mt-6`}>
+            <div className={`flex w-6/12 h-[10rem] ${list.length < 6 ?"":"scroll overflow-y-scroll"}  justify-center mt-6`}>
               <ul className="border w-full h-fit flex flex-col gap-2">
                 {
                   list.map((collection, idx)=>
                   <li key={idx} className="group relative hover:bg-slate-400 flex justify-between px-1">
                     <label className="flex gap-4">
                       <div className="flex flex-col justify-center" onClick={()=>{
-                        if(check !== collection.text) {
-                          setCheck(collection.text)
+                        if(check !== idx) {
+                          setCheck(idx)
                         }else{
                           setCheck(null)
                         }
                       }}>
-                        <button className={`${collection.text ===check ? "hidden" : ""}`}><RiCheckboxBlankCircleLine/></button>
-                        <button className={`${collection.text === check ? "" : "hidden"}`}><RiCheckboxCircleLine/></button>
+                        <button className={`${idx ===check ? "hidden" : ""}`}><RiCheckboxBlankCircleLine/></button>
+                        <button className={`${idx === check ? "" : "hidden"}`}><RiCheckboxCircleLine/></button>
                       </div>
                       {/* check ? "line-through" : "" */}
-                      <p className={`${collection.text === check ? "line-through":"underline" }`}>{collection.text}</p>  
+                      <p className={`${idx === check ? "line-through":"underline" }`}>{
+                      
+                      idx === edit && newItem.split("").length > 0 ? collection.text = newItem  : collection.text
+                      
+                      }</p>  
                     </label>
-                    <div className={`${collection.text === edit ? "flex" :"hidden"} absolute w-full justify-center bg-slate-400 border -ml-1 gap-8`}>
-                      <input className="w-9/12 placeholder:text-gray-500  placeholder:italic placeholder:text-[0.7rem] bg-slate-400 outline-none pl-8 border-blue-500 z-10 " placeholder="edit here" type="text" />
-                      <button onClick={()=>setEdit(null)} className="my-auto"><BiCheck/></button>
+                    <div className={`${idx === edit ? "flex" :"hidden"} absolute w-full justify-center bg-slate-400 border -ml-1 gap-8`}>
+                      <input
+                        value={newItem}
+                        onChange={(e)=>setNewItem(e.target.value)}
+                        className="w-9/12 placeholder:text-gray-500  placeholder:italic placeholder:text-[0.7rem] bg-slate-400 outline-none pl-8 border-blue-500 z-10 "  type="text" />
+                      <div>
+                      {/* <button onClick={()=>{setNewEdit(false)}} className="my-auto text-[0.9rem]"><RxCross2/></button> */}
+                      <button onClick={()=>{setEdit(null); setCheck(null); setNewItem("")}} className="my-auto"><BiCheck/></button>
+                      </div>
                     </div>
                   <div className="flex  justify-center gap-1">
-                    <button className={check === collection.text ? "block text-[0.75rem] my-auto" : "hidden"} onClick={()=>{
-                      if(edit !== collection.text){
-                        setEdit(collection.text)
+                    <button className={check === idx ? "block text-[0.75rem] my-auto" : "hidden"} onClick={()=>{
+                      if(edit !== idx){
+                        setEdit(idx);
+                        setNewItem(collection.text)
                       } else {
                         setEdit(null)
                       }
                     }}><AiOutlineEdit/></button>
-                    <button className={check === collection.text ? "block" : "hidden"} onClick={()=>handleDeletion(idx)}><GrFormTrash/></button>
+                    <button className={check === idx ? "block" : "hidden"} onClick={()=>handleDeletion(idx)}><GrFormTrash/></button>
                   </div></li>
                   )
                 }
